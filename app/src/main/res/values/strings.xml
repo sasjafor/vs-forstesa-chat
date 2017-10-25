@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">VS forstesa chat</string>
+    <string name="join_btn_text">Join</string>
+    <string name="settings_btn_text">Settings</string>
 </resources>
