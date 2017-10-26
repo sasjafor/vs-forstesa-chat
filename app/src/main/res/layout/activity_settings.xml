@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ch.ethz.inf.vs.a3.vsforstesachat.Settings">
+    tools:context="ch.ethz.inf.vs.a3.vsforstesachat.SettingsActivity">
 
     <TextView
         android:id="@+id/settings_title"
@@ -13,6 +13,7 @@
         android:text="@string/settings_text"/>
 
     <TextView
+        android:id="@+id/server_address_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
@@ -21,6 +22,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textUri" />
+
+    <TextView
+        android:id="@+id/server_port_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <EditText
         android:id="@+id/server_port"

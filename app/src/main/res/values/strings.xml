@@ -2,4 +2,5 @@
     <string name="app_name">VS forstesa chat</string>
     <string name="join_btn_text">Join</string>
     <string name="settings_text">Settings</string>
+    <string name="address_format_error">Address is not of the correct format</string>
 </resources>
