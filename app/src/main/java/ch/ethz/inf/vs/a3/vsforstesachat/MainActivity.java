@@ -6,24 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
 import java.util.UUID;
 
-import static ch.ethz.inf.vs.a3.udpclient.NetworkConsts.PAYLOAD_SIZE;
-import static ch.ethz.inf.vs.a3.udpclient.NetworkConsts.SERVER_ADDRESS;
-import static ch.ethz.inf.vs.a3.udpclient.NetworkConsts.SOCKET_TIMEOUT;
-import static ch.ethz.inf.vs.a3.udpclient.NetworkConsts.UDP_PORT;
 import static ch.ethz.inf.vs.a3.udpclient.NetworkFunctions.sendMessage;
 
 public class MainActivity extends AppCompatActivity {
@@ -35,13 +19,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onBtnJoin(View v) {
+        //retrieve username
         EditText username_field = (EditText) findViewById(R.id.username_field);
         username = username_field.getText().toString();
         System.out.println("DEBUG: username=" + username);
+
+        //generate uuid
         uuid = UUID.randomUUID();
+
+        //register user
         int res = sendMessage(username, uuid, "register");
         System.out.println("DEBUG: register_res="+res);
 
+        //launch chat activity
         Intent intent = new Intent(this, ChatActivity.class);
         intent.putExtra("username", username);
         intent.putExtra("uuid", uuid);
@@ -51,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onBtnSettings(View v) {
+        //launch settings activity
         this.startActivity(new Intent(this, SettingsActivity.class));
     }
 

@@ -18,21 +18,29 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        //get text fields
         address_field = (EditText) findViewById(R.id.server_address);
         port_field= (EditText) findViewById(R.id.server_port);
 
+        //set default values
         address_field.setText(SERVER_ADDRESS);
         port_field.setText(Integer.toString(UDP_PORT));
     }
 
     public void onBtnSave(View v) {
+
+        //get address from text field
         String address = address_field.getText().toString();
-        if (address.matches("[0-255].{3}[0-255]")) {
+
+        //check format and assign to constant if it matches
+        if (address.matches("\\A[0-255].{3}[0-255]\\z")) {
             SERVER_ADDRESS = address;
         } else {
             Toast toast = Toast.makeText(this, R.string.address_format_error, Toast.LENGTH_LONG);
             toast.show();
         }
+
+        //get port from text field and assign to constant
         UDP_PORT = Integer.parseInt(port_field.getText().toString());
     }
 
