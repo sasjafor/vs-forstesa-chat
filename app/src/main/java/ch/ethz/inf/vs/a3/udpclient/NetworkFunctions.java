@@ -48,9 +48,10 @@ public class NetworkFunctions {
             uhe.printStackTrace();
             return 1;
         }
+        System.out.println("DEBUG: addr="+addr.getHostAddress());
 
         //create packet
-        DatagramPacket packet = new DatagramPacket(data, PAYLOAD_SIZE, addr, UDP_PORT);
+        DatagramPacket packet = new DatagramPacket(data, data.length, addr, UDP_PORT);
 
         //create buffer for ack
         byte[] ack_buffer = new byte[PAYLOAD_SIZE];
@@ -72,12 +73,26 @@ public class NetworkFunctions {
             }
         }
 
-        System.out.println("DEBUG: raw_ack" + ack);
+        String json_ack_string = "";
         try {
-            System.out.println("DEUBG: ack=" + new String(ack.getData(), "UTF-8"));
+            json_ack_string = new String(ack.getData(), 0, ack.getLength(), "UTF-8");
+            System.out.println("DEUBG: ack=" + json_ack_string);
         } catch (UnsupportedEncodingException uee) {
 
         }
+        JSONObject json_ack;
+        try {
+            json_ack = new JSONObject(json_ack_string);
+            if (!(json_ack.getString("type").equals("ack") &&
+                    json_ack.getString("username").equals("server") &&
+                    json_ack.getString("uuid").equals(uuid))) {
+                return 1;
+            }
+        } catch (JSONException je) {
+            je.printStackTrace();
+            return 1;
+        }
+
         return 0;
     }
 
