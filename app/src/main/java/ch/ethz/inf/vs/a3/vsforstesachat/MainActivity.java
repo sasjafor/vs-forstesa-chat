@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -53,6 +54,9 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("uuid", uuid);
         if (res == 0) {
             this.startActivity(intent);
+        } else {
+            Toast toast = Toast.makeText(this, R.string.register_error,Toast.LENGTH_LONG);
+            toast.show();
         }
     }
 
