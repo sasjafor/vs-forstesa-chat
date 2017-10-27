@@ -3,12 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ch.ethz.inf.vs.a3.vsforstesachat.MainActivity">
+    tools:context="ch.ethz.inf.vs.a3.vsforstesachat.MainActivity"
+    android:orientation="vertical">
 
     <EditText
         android:id="@+id/username_field"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:inputType="text"/>
 
     <Button

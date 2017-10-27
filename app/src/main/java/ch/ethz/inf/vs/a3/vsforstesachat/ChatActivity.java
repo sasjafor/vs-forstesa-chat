@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a3.vsforstesachat;
 
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -23,14 +24,26 @@ public class ChatActivity extends AppCompatActivity {
     public void onPause() {
         super.onPause();
 
-        sendMessage(username, uuid, "deregister");
+        /*AsyncTask task = new AsyncTask() {
+            @Override
+            protected Object doInBackground(Object[] params) {
+                return sendMessage((String) params[0], (UUID) params[1], (String) params[2]);
+            }
+        };
+        task.execute(new Object[]{username, uuid, "deregister"});*/
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
 
-        sendMessage(username, uuid, "deregister");
+        AsyncTask task = new AsyncTask() {
+            @Override
+            protected Object doInBackground(Object[] params) {
+                return sendMessage((String) params[0], (UUID) params[1], (String) params[2]);
+            }
+        };
+        task.execute(new Object[]{username, uuid, "deregister"});
     }
 
     private static String username;

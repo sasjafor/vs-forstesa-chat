@@ -83,15 +83,18 @@ public class NetworkFunctions {
         JSONObject json_ack;
         try {
             json_ack = new JSONObject(json_ack_string);
-            if (!(json_ack.getString("type").equals("ack") &&
-                    json_ack.getString("username").equals("server") &&
-                    json_ack.getString("uuid").equals(uuid))) {
+            JSONObject header = json_ack.getJSONObject("header");
+            if (!(header.getString("type").equals("ack") &&
+                    header.getString("username").equals("server"))) {
                 return 1;
             }
         } catch (JSONException je) {
             je.printStackTrace();
             return 1;
         }
+
+        //close socket
+        socket.close();
 
         return 0;
     }
