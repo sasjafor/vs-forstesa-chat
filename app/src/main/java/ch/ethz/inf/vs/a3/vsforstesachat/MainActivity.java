@@ -8,9 +8,12 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+//import java.util.PriorityQueue;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
+import ch.ethz.inf.vs.a3.queue.PriorityQueue;
+import ch.ethz.inf.vs.a3.message.Message;
 import static ch.ethz.inf.vs.a3.udpclient.NetworkFunctions.sendMessage;
 
 public class MainActivity extends AppCompatActivity {
@@ -38,9 +41,9 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         task.execute(new Object[]{username, uuid, "register"});
-        int res = 1;
+        PriorityQueue<Message> res = null;
         try {
-            res = (int) task.get();
+            res = (PriorityQueue<Message>) task.get();
         } catch (InterruptedException ie) {
             ie.printStackTrace();
         } catch (ExecutionException ee) {
@@ -52,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, ChatActivity.class);
         intent.putExtra("username", username);
         intent.putExtra("uuid", uuid);
-        if (res == 0) {
+        if (res.isEmpty()) {
             this.startActivity(intent);
         } else {
             Toast toast = Toast.makeText(this, R.string.register_error,Toast.LENGTH_LONG);
