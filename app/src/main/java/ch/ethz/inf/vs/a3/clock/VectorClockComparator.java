@@ -8,7 +8,7 @@ public class VectorClockComparator implements Comparator<VectorClock> {
 
     @Override
     public int compare(VectorClock lhs, VectorClock rhs) {
-        // Write your code here
+        // TODO: implement
 
         return 0;
     }

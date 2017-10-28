@@ -10,11 +10,14 @@
     <TextView
         android:id="@+id/messages"
         android:layout_width="match_parent"
-        android:layout_height="452dp" />
+        android:layout_height="452dp"
+        android:text="messages"/>
 
     <Button
         android:id="@+id/btn_retrieve_messages"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="@string/getLog"
+        android:onClick="onBtnRetrieve"/>
 
 </LinearLayout>

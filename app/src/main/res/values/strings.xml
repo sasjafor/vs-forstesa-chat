@@ -4,4 +4,8 @@
     <string name="settings_text">Settings</string>
     <string name="address_format_error">Address is not of the correct format</string>
     <string name="register_error">Failed to register</string>
+    <string name="save">SAVE</string>
+
+    <string name="getLog">Retrieve chat log</string>
+
 </resources>

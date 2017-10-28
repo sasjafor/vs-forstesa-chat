@@ -3,6 +3,7 @@ package ch.ethz.inf.vs.a3.vsforstesachat;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 
 import java.util.UUID;
 
@@ -18,6 +19,18 @@ public class ChatActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         username = extras.getString("username");
         uuid = (UUID) extras.get("uuid");
+    }
+
+    public void onBtnRetrieve(View v) {
+
+        AsyncTask task = new AsyncTask() {
+            @Override
+            protected Object doInBackground(Object[] params) {
+                return sendMessage((String) params[0], (UUID) params[1], (String) params[2]);
+            }
+        };
+        task.execute(new Object[]{username, uuid, "retrieve_chat_log"});
+
     }
 
     @Override
