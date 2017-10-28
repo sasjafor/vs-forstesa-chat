@@ -55,9 +55,13 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, ChatActivity.class);
         intent.putExtra("username", username);
         intent.putExtra("uuid", uuid);
-        if (res.isEmpty()) {
+        if (res == null) {
+            Toast toast = Toast.makeText(this, R.string.register_error,Toast.LENGTH_LONG);
+            toast.show();
+        } else if (res.isEmpty()){
             this.startActivity(intent);
-        } else {
+        }
+        else {
             Toast toast = Toast.makeText(this, R.string.register_error,Toast.LENGTH_LONG);
             toast.show();
         }
