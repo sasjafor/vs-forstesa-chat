@@ -10,8 +10,7 @@
     <TextView
         android:id="@+id/messages"
         android:layout_width="match_parent"
-        android:layout_height="452dp"
-        android:text="messages"/>
+        android:layout_height="452dp" />
 
     <Button
         android:id="@+id/btn_retrieve_messages"

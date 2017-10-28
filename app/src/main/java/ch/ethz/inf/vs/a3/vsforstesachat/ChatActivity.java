@@ -4,9 +4,14 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
+import ch.ethz.inf.vs.a3.queue.PriorityQueue;
+import ch.ethz.inf.vs.a3.message.Message;
 import static ch.ethz.inf.vs.a3.udpclient.NetworkFunctions.sendMessage;
 
 public class ChatActivity extends AppCompatActivity {
@@ -30,6 +35,31 @@ public class ChatActivity extends AppCompatActivity {
             }
         };
         task.execute(new Object[]{username, uuid, "retrieve_chat_log"});
+
+        PriorityQueue<Message> chat_log = null;
+
+        try {
+            chat_log = (PriorityQueue<Message>) task.get();
+        } catch (InterruptedException ie) {
+            ie.printStackTrace();
+        } catch (ExecutionException ee) {
+            ee.printStackTrace();
+        }
+
+        if (chat_log == null) {
+            Toast toast = Toast.makeText(this, R.string.chat_log_error,Toast.LENGTH_LONG);
+            toast.show();
+        } else if (chat_log.isEmpty()) {
+            Toast toast = Toast.makeText(this, R.string.no_messages, Toast.LENGTH_LONG);
+            toast.show();
+        } else {
+            textView = (TextView) findViewById(R.id.messages);
+            int length = chat_log.size();
+            for (int i = 0; i < length; i++) {
+                String text = chat_log.poll().content.toString();
+                textView.append(text + "\n");
+            }
+        }
 
     }
 
@@ -61,4 +91,5 @@ public class ChatActivity extends AppCompatActivity {
 
     private static String username;
     private static UUID uuid;
+    private TextView textView;
 }

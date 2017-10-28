@@ -142,6 +142,11 @@ public class NetworkFunctions {
                         return null; //error
                     }
 
+                    // need break statement because else the last message received gets appended twice to the priority list
+                    if (timeout) {
+                        break;
+                    }
+
                     // create JSONObject
                     try {
                         json_message_string = new String(chat_message.getData(), 0, chat_message.getLength(), "UTF-8");
