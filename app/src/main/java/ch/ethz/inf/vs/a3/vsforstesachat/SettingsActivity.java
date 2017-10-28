@@ -34,22 +34,13 @@ public class SettingsActivity extends AppCompatActivity {
         String address = address_field.getText().toString();
 
         //check format and assign to constant if it matches
-        Pattern pattern = Pattern.compile("[0-255].{3}[0-255]");
-        Matcher matcher = pattern.matcher(address);
-        if (matcher.find()) {
+        if (address.matches("^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$")) {
             SERVER_ADDRESS = address;
         } else {
             Toast toast = Toast.makeText(this, R.string.address_format_error, Toast.LENGTH_LONG);
             toast.show();
         }
-        /*
-        if (address.matches("\\A[0-255].{3}[0-255]\\z")) {
-            SERVER_ADDRESS = address;
-        } else {
-            Toast toast = Toast.makeText(this, R.string.address_format_error, Toast.LENGTH_LONG);
-            toast.show();
-        }
-*/
+
         //get port from text field and assign to constant
         UDP_PORT = Integer.parseInt(port_field.getText().toString());
     }
