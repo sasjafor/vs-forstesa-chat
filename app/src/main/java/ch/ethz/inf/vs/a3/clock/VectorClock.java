@@ -5,93 +5,94 @@ import java.util.Map;
 
 public class VectorClock implements Clock {
 
+    private Map<Integer, Integer> vector;
+
     public VectorClock() {
-        vector = new HashMap<>();
+        vector = new HashMap<Integer, Integer>();
     }
 
     @Override
     public void update(Clock other) {
-        // needs fixing
-        VectorClock other_clock = ((VectorClock) other);
-        String other_clock_string;
-        for (Integer t_local : vector.keySet()) {
-            for (Integer t_other : other_clock.vector.keySet()) {
-                int other_time = other_clock.getTime(t_other);
-                if (t_local == t_other && vector.get(t_local) < other_time){
-                    vector.put(t_local, other_time);
-                } else if (t_local != t_other){
-                    vector.put(t_other, other_time);
-                }
+        VectorClock otherClock = new VectorClock();
+        otherClock.setClock(other);
+        for (Map.Entry<Integer, Integer> entry : otherClock.vector.entrySet()) {
+            if ((entry.getValue()) > getTime(entry.getKey())) {
+                addProcess(entry.getKey(), entry.getValue());
             }
         }
     }
 
     @Override
     public void setClock(Clock other) {
-        VectorClock other_clock = ((VectorClock) other);
-        for (Integer t : vector.keySet()) {
-            vector.put(t, other_clock.getTime(t));
-        }
+        VectorClock otherClock = (VectorClock) other;
+        vector = otherClock.vector;
     }
 
     @Override
     public void tick(Integer pid) {
-        int t = vector.get(pid) + 1;
-        vector.put(pid, t);
+        addProcess(pid, getTime(pid)+1);
     }
 
     @Override
     public boolean happenedBefore(Clock other) {
-        VectorClock other_clock = ((VectorClock) other);
-        for (Integer t : vector.keySet()) {
-            if (vector.get(t) > other_clock.getTime(t)) {
+        boolean before = false;
+        VectorClock otherClock = (VectorClock) other;
+        for (Map.Entry<Integer, Integer> entry : vector.entrySet()) {
+            if ((entry.getValue()) > otherClock.getTime(entry.getKey())) {
                 return false;
+            } else if ((entry.getValue()) < otherClock.getTime(entry.getKey())) {
+                before = true;
             }
         }
-        return true;
+        return before;
     }
 
     @Override
     public String toString() {
-        String res = "{";
-        for (Integer t : vector.keySet()) {
-            res = res + "\"" + t + "\":" + vector.get(t) + ",";
+        String result = "";
+        for (Map.Entry<Integer, Integer> entry : vector.entrySet()) {
+            result += "\"" + entry.getKey().toString() + "\":" + entry.getValue().toString() + ",";
         }
-        if (res.endsWith(",")){
-            res = res.substring(0, res.length() - 1);
-        }
-        return res + "}";
+        if (result.isEmpty()) return "{}";
+        result = "{" + result.substring(0, result.length()-1) + "}";
+        return result;
     }
 
     @Override
     public void setClockFromString(String clock) {
         if (clock.startsWith("{") && clock.endsWith("}")) {
-            String temp = clock.substring(1, clock.length() - 1);
-            if (temp.isEmpty()) {
+            if (clock.length()==2) {
                 vector.clear();
+            } else {
+                String sub = clock.substring(1, clock.length()-1);
+                String[] ele = sub.replaceAll(":","").replaceAll(",","").split("\"");
+
+                VectorClock helper = new VectorClock();
+                boolean reset = false;
+
+                for (int i=1; i<ele.length; i=i+2) {
+                    try {
+                        Integer key = Integer.parseInt(ele[i]);
+                        int value = Integer.parseInt(ele[i+1]);
+                        helper.addProcess(key, value);
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                        reset = true;
+                        break;
+                    }
+                }
+                if (!reset) vector = helper.vector;
             }
         }
     }
 
-    /**
-     * getTime
-     *
-     * @param pid
-     * @return time if vector has an entry with pid, -1 otherwise
-     */
     public int getTime(Integer pid) {
         Integer t = vector.get(pid);
-        if (t != null) {
-            return t;
-        } else {
-            return -1;
-        }
-
+        if (t != null) return t;
+        else return -1;
     }
 
     public void addProcess(Integer pid, int time) {
         vector.put(pid, time);
     }
-
-    private Map<Integer, Integer> vector;
 }
