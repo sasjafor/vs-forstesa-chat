@@ -15,7 +15,6 @@ public class MessageComparator implements Comparator<Message> {
 
     @Override
     public int compare(Message lhs, Message rhs) {
-        // TODO: implement
         VectorClockComparator comparator = new VectorClockComparator();
 
         VectorClock lClock = lhs.timestamp;

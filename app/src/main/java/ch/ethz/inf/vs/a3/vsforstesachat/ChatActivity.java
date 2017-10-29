@@ -3,9 +3,12 @@ package ch.ethz.inf.vs.a3.vsforstesachat;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -24,6 +27,9 @@ public class ChatActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         username = extras.getString("username");
         uuid = (UUID) extras.get("uuid");
+
+        textView = (TextView) findViewById(R.id.messages);
+        textView.setMovementMethod(new ScrollingMovementMethod());
     }
 
     public void onBtnRetrieve(View v) {
@@ -53,7 +59,6 @@ public class ChatActivity extends AppCompatActivity {
             Toast toast = Toast.makeText(this, R.string.no_messages, Toast.LENGTH_LONG);
             toast.show();
         } else {
-            textView = (TextView) findViewById(R.id.messages);
             int length = chat_log.size();
             for (int i = 0; i < length; i++) {
                 String text = chat_log.poll().content.toString();
