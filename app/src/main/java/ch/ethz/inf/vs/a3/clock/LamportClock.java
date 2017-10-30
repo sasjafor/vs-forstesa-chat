@@ -33,7 +33,7 @@ public class LamportClock implements Clock {
         try {
             time = Integer.parseInt(clock);
         } catch (NumberFormatException nfe) {
-            nfe.printStackTrace();
+            //nfe.printStackTrace();
         }
     }
 

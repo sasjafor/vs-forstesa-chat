@@ -8,7 +8,7 @@ public class VectorClock implements Clock {
     private Map<Integer, Integer> vector;
 
     public VectorClock() {
-        vector = new HashMap<Integer, Integer>();
+        vector = new HashMap<>();
     }
 
     @Override
@@ -76,7 +76,7 @@ public class VectorClock implements Clock {
                         int value = Integer.parseInt(ele[i+1]);
                         helper.addProcess(key, value);
                     } catch (NumberFormatException e) {
-                        e.printStackTrace();
+                        //e.printStackTrace();
                         reset = true;
                         break;
                     }

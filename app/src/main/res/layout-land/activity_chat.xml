@@ -10,12 +10,11 @@
 
     <TextView
         android:id="@+id/messages"
-        android:layout_width="380dp"
-        android:layout_height="480dp"
+        android:layout_width="600dp"
+        android:layout_height="250dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp"
-        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="6dp"
         android:background="@drawable/back"
         android:scrollbars="vertical" />
 
@@ -23,9 +22,9 @@
         android:id="@+id/btn_retrieve_messages"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/messages"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="47dp"
+        android:layout_marginTop="7dp"
         android:onClick="onBtnRetrieve"
         android:text="@string/getLog" />
 
