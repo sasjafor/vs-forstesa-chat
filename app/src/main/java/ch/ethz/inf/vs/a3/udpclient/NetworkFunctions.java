@@ -12,7 +12,6 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-//import java.util.PriorityQueue;
 import java.util.UUID;
 
 import ch.ethz.inf.vs.a3.queue.PriorityQueue;

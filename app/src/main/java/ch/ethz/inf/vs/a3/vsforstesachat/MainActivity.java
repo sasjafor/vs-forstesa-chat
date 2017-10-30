@@ -28,6 +28,12 @@ public class MainActivity extends AppCompatActivity {
         //retrieve username
         EditText username_field = (EditText) findViewById(R.id.username_field);
         username = username_field.getText().toString();
+
+        if (username.isEmpty()) {
+            Toast toast = Toast.makeText(this, R.string.username_error, Toast.LENGTH_LONG);
+            toast.show();
+            return;
+        }
         System.out.println("DEBUG: username=" + username);
 
         //generate uuid
