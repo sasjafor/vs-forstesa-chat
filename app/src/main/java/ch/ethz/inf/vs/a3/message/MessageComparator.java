@@ -22,7 +22,7 @@ public class MessageComparator implements Comparator<Message> {
 
         int comp;
         comp = comparator.compare(lClock, rClock);
-        return (-1)*comp;
+        return comp;
     }
 
 }

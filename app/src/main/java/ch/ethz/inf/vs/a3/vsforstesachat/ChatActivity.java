@@ -34,6 +34,8 @@ public class ChatActivity extends AppCompatActivity {
 
     public void onBtnRetrieve(View v) {
 
+        textView.setText("");
+
         AsyncTask task = new AsyncTask() {
             @Override
             protected Object doInBackground(Object[] params) {
