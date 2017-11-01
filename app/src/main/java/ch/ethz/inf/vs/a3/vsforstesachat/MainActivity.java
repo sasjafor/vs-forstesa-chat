@@ -36,10 +36,8 @@ public class MainActivity extends AppCompatActivity {
                 PriorityQueue<Message> res = null;
                 try {
                     res = (PriorityQueue<Message>) handler.get();
-                } catch (InterruptedException ie) {
-                    ie.printStackTrace();
-                } catch (ExecutionException ee) {
-                    ee.printStackTrace();
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
                 }
                 System.out.println("DEBUG: register_res="+res);
 
@@ -73,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         username = username_field.getText().toString();
 
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (cm.getActiveNetworkInfo() == null) {
+        if (cm != null && cm.getActiveNetworkInfo() == null) {
             Toast toast = Toast.makeText(this, R.string.network_error, Toast.LENGTH_LONG);
             toast.show();
             return;
@@ -90,14 +88,8 @@ public class MainActivity extends AppCompatActivity {
         uuid = UUID.randomUUID();
 
         //register user using async task
-        /*AsyncTask task = new AsyncTask() {
-            @Override
-            protected Object doInBackground(Object[] params) {
-                return sendMessage((String) params[0], (UUID) params[1], (String) params[2]);
-            }
-        };*/
         handler = new MessageHandler(this);
-        handler.execute(new Object[]{username, uuid, REGISTER});
+        handler.execute(username, uuid, REGISTER);
 
         registerReceiver(broadcastReceiver, intentFilter);
         registered = true;
@@ -129,6 +121,6 @@ public class MainActivity extends AppCompatActivity {
     private static UUID uuid;
     private static BroadcastReceiver broadcastReceiver;
     private static IntentFilter intentFilter;
-    private static MessageHandler handler;
+    private MessageHandler handler;
     private static boolean registered;
 }

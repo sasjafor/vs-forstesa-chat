@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a3.udpclient;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -22,6 +23,11 @@ import ch.ethz.inf.vs.a3.queue.PriorityQueue;
 import ch.ethz.inf.vs.a3.message.Message;
 import ch.ethz.inf.vs.a3.message.MessageComparator;
 
+import static ch.ethz.inf.vs.a3.message.MessageTypes.ACK_MESSAGE;
+import static ch.ethz.inf.vs.a3.message.MessageTypes.CHAT_MESSAGE;
+import static ch.ethz.inf.vs.a3.message.MessageTypes.DEREGISTER;
+import static ch.ethz.inf.vs.a3.message.MessageTypes.REGISTER;
+import static ch.ethz.inf.vs.a3.message.MessageTypes.RETRIEVE_CHAT_LOG;
 import static ch.ethz.inf.vs.a3.udpclient.NetworkConsts.PAYLOAD_SIZE;
 import static ch.ethz.inf.vs.a3.udpclient.NetworkConsts.SERVER_ADDRESS;
 import static ch.ethz.inf.vs.a3.udpclient.NetworkConsts.SOCKET_TIMEOUT;
@@ -33,7 +39,7 @@ public class MessageHandler extends AsyncTask<Object, Object, Object>{
         this.context = context;
     }
 
-    public static PriorityQueue<Message> sendMessage(String username, UUID uuid, String type) {
+    private static PriorityQueue<Message> sendMessage(String username, UUID uuid, String type) {
         //create socket
         DatagramSocket socket;
 
@@ -47,7 +53,14 @@ public class MessageHandler extends AsyncTask<Object, Object, Object>{
         }
 
         //create message
-        JSONObject message = makeMessage(username, uuid, type);
+        JSONObject message;
+        try {
+            message = makeMessage(username, uuid, type);
+        } catch (JSONException je) {
+            je.printStackTrace();
+            socket.close();
+            return null; //error
+        }
 
         //convert to byte array
         byte[] data = message.toString().getBytes();
@@ -69,7 +82,7 @@ public class MessageHandler extends AsyncTask<Object, Object, Object>{
         // handling different types of messages
         switch (type) {
 
-            case "register": case "deregister":
+            case REGISTER: case DEREGISTER:
 
                 //create buffer for ack
                 byte[] ack_buffer = new byte[PAYLOAD_SIZE];
@@ -84,7 +97,7 @@ public class MessageHandler extends AsyncTask<Object, Object, Object>{
                         socket.receive(ack);
                         break;
                     } catch (SocketTimeoutException ste) {
-
+                        //retry
                     } catch (IOException ioe) {
                         ioe.printStackTrace();
                         socket.close();
@@ -92,18 +105,19 @@ public class MessageHandler extends AsyncTask<Object, Object, Object>{
                     }
                 }
 
-                String json_ack_string = "";
+                String json_ack_string;
                 try {
                     json_ack_string = new String(ack.getData(), 0, ack.getLength(), "UTF-8");
-                    System.out.println("DEUBG: ack=" + json_ack_string);
+                    System.out.println("DEBUG: ack=" + json_ack_string);
                 } catch (UnsupportedEncodingException uee) {
-
+                    socket.close();
+                    return null; //error
                 }
                 JSONObject json_ack;
                 try {
                     json_ack = new JSONObject(json_ack_string);
                     JSONObject header = json_ack.getJSONObject("header");
-                    if (!(header.getString("type").equals("ack") &&
+                    if (!(header.getString("type").equals(ACK_MESSAGE) &&
                             header.getString("username").equals("server"))) {
                         socket.close();
                         return null; //error
@@ -117,10 +131,9 @@ public class MessageHandler extends AsyncTask<Object, Object, Object>{
                 //close socket
                 socket.close();
 
-                PriorityQueue<Message> empty = new PriorityQueue(null);
-                return empty;
+                return new PriorityQueue<>(null);
 
-            case "retrieve_chat_log":
+            case RETRIEVE_CHAT_LOG:
 
                 byte[] chat_message_buffer = new byte[PAYLOAD_SIZE];
                 DatagramPacket chat_message = new DatagramPacket(chat_message_buffer, PAYLOAD_SIZE);
@@ -135,43 +148,38 @@ public class MessageHandler extends AsyncTask<Object, Object, Object>{
                 }
 
                 // receive chat messages, create a JSONObject for each and add them to the priority queue until there is a socket timeout (all messages are sent)
-                boolean timeout = false;
-                String json_message_string = "";
+                String json_message_string;
                 JSONObject json_message;
                 Message message_obj;
 
                 MessageComparator comparator = new MessageComparator();
-                PriorityQueue<Message> chat_log = new PriorityQueue(comparator);
-                while (!timeout) {
-
+                PriorityQueue<Message> chat_log = new PriorityQueue<>(comparator);
+                while (true) {
                     // receive
                     try {
                         socket.receive(chat_message);
                     } catch (SocketTimeoutException ste) {
-                        timeout = true;
+                        // need break statement because else the last message received gets appended twice to the priority list
+                        break;
                     } catch (IOException ioe) {
                         ioe.printStackTrace();
                         socket.close();
                         return null; //error
                     }
 
-                    // need break statement because else the last message received gets appended twice to the priority list
-                    if (timeout) {
-                        break;
-                    }
-
                     // create JSONObject
                     try {
                         json_message_string = new String(chat_message.getData(), 0, chat_message.getLength(), "UTF-8");
                     } catch (UnsupportedEncodingException uee) {
-
+                        socket.close();
+                        return null; //error
                     }
 
                     try {
                         json_message = new JSONObject(json_message_string);
                         JSONObject header = json_message.getJSONObject("header");
                         JSONObject body = json_message.getJSONObject("body");
-                        if (!(header.getString("type").equals("message"))) {
+                        if (!(header.getString("type").equals(CHAT_MESSAGE))) {
                             socket.close();
                             return null; //error
                         }
@@ -199,24 +207,20 @@ public class MessageHandler extends AsyncTask<Object, Object, Object>{
 
     }
 
-    private static JSONObject makeMessage(String username, UUID uuid, String type) {
+    private static JSONObject makeMessage(String username, UUID uuid, String type) throws JSONException{
         //create json objects
         JSONObject message = new JSONObject();
         JSONObject header = new JSONObject();
         JSONObject body = new JSONObject();
 
         //insert data into message json object
-        try {
-            header.put("username", username);
-            header.put("uuid", uuid);
-            header.put("timestamp", "{}");
-            header.put("type", type);
+        header.put("username", username);
+        header.put("uuid", uuid);
+        header.put("timestamp", "{}");
+        header.put("type", type);
 
-            message.put("header", header);
-            message.put("body", body);
-        } catch (JSONException je) {
-
-        }
+        message.put("header", header);
+        message.put("body", body);
         return message;
     }
 
@@ -234,5 +238,6 @@ public class MessageHandler extends AsyncTask<Object, Object, Object>{
     }
 
     private static final int TRIES = 6;
+    @SuppressLint("StaticFieldLeak")
     private Context context;
 }

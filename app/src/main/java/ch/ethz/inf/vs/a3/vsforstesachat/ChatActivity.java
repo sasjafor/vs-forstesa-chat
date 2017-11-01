@@ -30,25 +30,24 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         Bundle extras = getIntent().getExtras();
-        username = extras.getString("username");
-        uuid = (UUID) extras.get("uuid");
+        if (extras != null) {
+            username = extras.getString("username");
+            uuid = (UUID) extras.get("uuid");
+        } else {
+            Toast toast = Toast.makeText(this, R.string.intent_extras_error, Toast.LENGTH_LONG);
+            toast.show();
+        }
+
 
         textView = (TextView) findViewById(R.id.messages);
         textView.setMovementMethod(new ScrollingMovementMethod());
     }
 
     public void onBtnRetrieve(View v) {
-
         textView.setText("");
 
-        /*AsyncTask task = new AsyncTask() {
-            @Override
-            protected Object doInBackground(Object[] params) {
-                return sendMessage((String) params[0], (UUID) params[1], (String) params[2]);
-            }
-        };*/
         handler = new MessageHandler(this);
-        handler.execute(new Object[]{username, uuid, RETRIEVE_CHAT_LOG});
+        handler.execute(username, uuid, RETRIEVE_CHAT_LOG);
     }
 
     @Override
@@ -62,10 +61,8 @@ public class ChatActivity extends AppCompatActivity {
 
                 try {
                     chat_log = (PriorityQueue<Message>) handler.get();
-                } catch (InterruptedException ie) {
-                    ie.printStackTrace();
-                } catch (ExecutionException ee) {
-                    ee.printStackTrace();
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
                 }
 
                 if (chat_log == null) {
@@ -77,7 +74,7 @@ public class ChatActivity extends AppCompatActivity {
                 } else {
                     int length = chat_log.size();
                     for (int i = 0; i < length; i++) {
-                        String text = chat_log.poll().content.toString();
+                        String text = chat_log.poll().content;
                         textView.append(text + "\n");
                     }
                 }
@@ -97,7 +94,7 @@ public class ChatActivity extends AppCompatActivity {
         super.onStop();
 
         handler = new MessageHandler(this);
-        handler.execute(new Object[]{username, uuid, DEREGISTER});
+        handler.execute(username, uuid, DEREGISTER);
     }
 
     @Override
@@ -105,12 +102,12 @@ public class ChatActivity extends AppCompatActivity {
         super.onRestart();
 
         handler = new MessageHandler(this);
-        handler.execute(new Object[]{username, uuid, REGISTER});
+        handler.execute(username, uuid, REGISTER);
     }
 
     private static String username;
     private static UUID uuid;
     private TextView textView;
     private BroadcastReceiver broadcastReceiver;
-    private static MessageHandler handler;
+    private MessageHandler handler;
 }

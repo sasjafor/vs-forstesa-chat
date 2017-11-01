@@ -10,4 +10,5 @@
     <string name="getLog">Retrieve chat log</string>
     <string name="chat_log_error">Failed to retrieve chat log</string>
     <string name="no_messages">There are no chat messages available</string>
+    <string name="intent_extras_error">Failed to get extras from intent</string>
 </resources>
