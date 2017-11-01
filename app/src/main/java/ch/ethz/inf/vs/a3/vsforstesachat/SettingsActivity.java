@@ -46,8 +46,16 @@ public class SettingsActivity extends AppCompatActivity {
         int port = Integer.parseInt(port_field.getText().toString());
         if (port >= 0 && port <= 65535) {
             UDP_PORT = port;
+        } else {
+            Toast toast = Toast.makeText(this, R.string.port_range_error, Toast.LENGTH_LONG);
+            toast.show();
+            return;
         }
 
+        Toast toast = Toast.makeText(this, R.string.settings_saved, Toast.LENGTH_LONG);
+        toast.show();
+
+        this.finish();
     }
 
     private EditText address_field, port_field;
