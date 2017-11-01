@@ -4,9 +4,9 @@
     <string name="settings_text">Settings</string>
     <string name="address_format_error">Address is not of the correct format</string>
     <string name="username_error">Please enter a username</string>
+    <string name="network_error">No internet connection available</string>
     <string name="register_error">Failed to register</string>
     <string name="save">SAVE</string>
-
     <string name="getLog">Retrieve chat log</string>
     <string name="chat_log_error">Failed to retrieve chat log</string>
     <string name="no_messages">There are no chat messages available</string>

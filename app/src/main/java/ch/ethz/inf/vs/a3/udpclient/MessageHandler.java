@@ -1,5 +1,9 @@
 package ch.ethz.inf.vs.a3.udpclient;
 
+import android.content.Context;
+import android.content.Intent;
+import android.os.AsyncTask;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -23,7 +27,11 @@ import static ch.ethz.inf.vs.a3.udpclient.NetworkConsts.SERVER_ADDRESS;
 import static ch.ethz.inf.vs.a3.udpclient.NetworkConsts.SOCKET_TIMEOUT;
 import static ch.ethz.inf.vs.a3.udpclient.NetworkConsts.UDP_PORT;
 
-public class NetworkFunctions {
+public class MessageHandler extends AsyncTask<Object, Object, Object>{
+
+    public MessageHandler(Context context) {
+        this.context = context;
+    }
 
     public static PriorityQueue<Message> sendMessage(String username, UUID uuid, String type) {
         //create socket
@@ -50,6 +58,7 @@ public class NetworkFunctions {
             addr = Inet4Address.getByName(SERVER_ADDRESS);
         } catch (UnknownHostException uhe) {
             uhe.printStackTrace();
+            socket.close();
             return null; //error
         }
         System.out.println("DEBUG: addr="+addr.getHostAddress());
@@ -69,7 +78,7 @@ public class NetworkFunctions {
                 DatagramPacket ack = new DatagramPacket(ack_buffer, PAYLOAD_SIZE);
 
                 //try to send message and receive ack RETRIES many times
-                for (int k = 0; k < RETRIES; k++) {
+                for (int k = 0; k < TRIES; k++) {
                     try {
                         socket.send(packet);
                         socket.receive(ack);
@@ -78,6 +87,7 @@ public class NetworkFunctions {
 
                     } catch (IOException ioe) {
                         ioe.printStackTrace();
+                        socket.close();
                         return null; //error
                     }
                 }
@@ -95,10 +105,12 @@ public class NetworkFunctions {
                     JSONObject header = json_ack.getJSONObject("header");
                     if (!(header.getString("type").equals("ack") &&
                             header.getString("username").equals("server"))) {
+                        socket.close();
                         return null; //error
                     }
                 } catch (JSONException je) {
                     je.printStackTrace();
+                    socket.close();
                     return null; //error
                 }
 
@@ -118,6 +130,7 @@ public class NetworkFunctions {
                     socket.send(packet);
                 } catch (IOException ioe) {
                     ioe.printStackTrace();
+                    socket.close();
                     return null; //error
                 }
 
@@ -138,6 +151,7 @@ public class NetworkFunctions {
                         timeout = true;
                     } catch (IOException ioe) {
                         ioe.printStackTrace();
+                        socket.close();
                         return null; //error
                     }
 
@@ -158,6 +172,7 @@ public class NetworkFunctions {
                         JSONObject header = json_message.getJSONObject("header");
                         JSONObject body = json_message.getJSONObject("body");
                         if (!(header.getString("type").equals("message"))) {
+                            socket.close();
                             return null; //error
                         }
                         // create Message object from JSONObject
@@ -167,6 +182,7 @@ public class NetworkFunctions {
 
                     } catch (JSONException je) {
                         je.printStackTrace();
+                        socket.close();
                         return null; //error
                     }
 
@@ -204,5 +220,19 @@ public class NetworkFunctions {
         return message;
     }
 
-    private static final int RETRIES = 5;
+
+
+    @Override
+    protected PriorityQueue<Message> doInBackground(Object[] params) {
+        return sendMessage((String) params[0], (UUID) params[1], (String) params[2]);
+    }
+
+    @Override
+    protected void onPostExecute(Object result) {
+        Intent intent = new Intent("COMMUNICATION_FINISHED");
+        context.sendBroadcast(intent);
+    }
+
+    private static final int TRIES = 6;
+    private Context context;
 }
